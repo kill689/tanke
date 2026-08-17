@@ -19,38 +19,30 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Consolas','Courier New','Microsoft YaHei',monospace;color:var(--txt);user-select:none}
-  body{display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(ellipse at 30% 20%,#121a30 0%,#050812 60%,#010206 100%)}
+  body{display:flex;align-items:center;justify-content:center;background:#000}
 
   #wrap{position:relative;width:1280px;height:800px;max-width:100vw;max-height:100vh;aspect-ratio:16/10}
-  #game{display:block;width:100%;height:100%;background:var(--bg);
-    image-rendering:pixelated;box-shadow:0 0 60px rgba(0,245,255,.12),0 20px 80px rgba(0,0,0,.9),inset 0 0 0 1px rgba(0,245,255,.2)}
+  #game{display:block;width:100%;height:100%;background:#040608;
+    image-rendering:pixelated;box-shadow:0 0 60px rgba(0,150,255,.15),0 20px 80px rgba(0,0,0,.95)}
 
-  /* ===== 动态网格背景（赛博 UI） ===== */
-  .cyber-grid{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-  .cyber-grid::before{content:"";position:absolute;inset:-50%;
-    background-image:
-      linear-gradient(rgba(0,245,255,.04) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,245,255,.04) 1px,transparent 1px);
-    background-size:40px 40px;
-    animation:gridpan 12s linear infinite;
-    transform:perspective(600px) rotateX(55deg) translateY(20%);
-    transform-origin:center bottom;
-    opacity:.6}
-  @keyframes gridpan{from{background-position:0 0}to{background-position:0 40px}}
-  .cyber-scan{position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(180deg,transparent 0%,rgba(0,245,255,.08) 50%,transparent 100%);
-    background-size:100% 6px;animation:scan 3s linear infinite;opacity:.4}
-  @keyframes scan{from{background-position:0 -100%}to{background-position:0 100%}}
+  /* ===== 动态网格背景（已隐藏，使用图片背景） ===== */
+  .cyber-grid{display:none}
+  .cyber-scan{display:none}
 
   /* ===== 覆盖层 UI ===== */
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    background:radial-gradient(ellipse at center,rgba(5,10,25,.92) 0%,rgba(1,2,8,.98) 100%);
-    z-index:10;backdrop-filter:blur(4px)}
+    background-color:rgba(5,10,25,0.65);
+    background-image:url('背景图片.png');
+    background-size:cover;
+    background-position:center;
+    z-index:10;
+  }
+  .overlay::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse at center,rgba(5,10,25,0.3) 0%,rgba(1,2,8,0.65) 100%);
+    pointer-events:none;z-index:0}
   .overlay.hidden{display:none}
-  .overlay::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background:repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px);opacity:.6}
-  @keyframes scan{from{background-position:0 0}to{background-position:0 100px}}
+  .overlay::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px);opacity:.5}
 
   .title{font-size:52px;font-weight:900;letter-spacing:6px;position:relative;z-index:2;
     background:linear-gradient(135deg,var(--neon-cyan) 0%,var(--neon-purple) 50%,var(--neon-pink) 100%);
@@ -264,7 +256,7 @@
       <p>· 4 辆坦克混战，被子弹击中即死亡，最后存活者得分</p>
       <p>· 子弹撞墙会<b style="color:var(--cyan)">反弹</b>，反弹后可击中自己，注意走位</p>
       <p>· 击杀 +2 分，单局存活到最后 +1 分，先达目标分数获胜</p>
-      <p>· <b style="color:var(--cyan)">无尽模式</b>无目标分数，可以一直挑战；玩家死亡即结束，以击杀数和波数为成就</p>
+      <p>· <b style="color:var(--cyan)">无尽升级模式</b>无目标分数，击杀敌人升级获得能力强化，挑战更高等级</p>
       <p>· 道具<b style="color:var(--gold)">一次仅刷新一个</b>，被吃掉后 <b style="color:var(--gold)">12 秒</b>才会出现下一个（道具狂欢模式刷新更频繁）</p>
       <p>· 拾取道具获得强化：三倍弹药武器、3 层消耗式护盾、2.3x 加速、5 发散射、隐身、4 雷部署等，效果持续到消耗完毕</p>
       <p style="margin-top:10px;color:var(--dim)">桌面：方向键/WASD 转向移动 · 空格/J 射击 · P 暂停</p>
@@ -352,8 +344,7 @@ const MODES = {
   mayhem:   { name:'道具狂欢', team:[0,1,2,3], pItem:0.3 },
   onelife:  { name:'一命通关', team:[0,1,2,3], onelife:true },
   survival: { name:'生存挑战', team:[0,1,2,3], poison:true },
-  roguelike:{ name:'肉鸽闯关', team:[0,1,2,3], roguelike:true },
-  endless:  { name:'无尽模式', team:[0,1,2,3], endless:true },
+  endless:  { name:'无尽升级', team:[0,1,2,3], endless:true },
 };
 
 // ==================== 地图 ====================
@@ -1136,6 +1127,34 @@ class Tank{
     const alpha=this.stealth>0?0.35:1;
     const col=this.displayColor;
     ctx.globalAlpha=alpha;
+    
+    // 玩家坦克金色光晕（方便定位）
+    if(this.isPlayer){
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      const pulse=0.5+Math.sin(Date.now()/600)*0.25;
+      // 外层柔光晕（更大范围）
+      const farGlow=ctx.createRadialGradient(this.x,this.y,this.size*0.3,this.x,this.y,this.size*1.8);
+      farGlow.addColorStop(0,'rgba(255,210,100,'+(0.4+pulse*0.2)+')');
+      farGlow.addColorStop(0.5,'rgba(255,170,60,'+(0.15+pulse*0.08)+')');
+      farGlow.addColorStop(1,'rgba(255,140,30,0)');
+      ctx.fillStyle=farGlow;
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size*1.8,0,Math.PI*2);
+      ctx.fill();
+      // 内层亮核心
+      const coreGlow=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*0.9);
+      coreGlow.addColorStop(0,'rgba(255,235,150,'+(0.55+pulse*0.2)+')');
+      coreGlow.addColorStop(0.6,'rgba(255,200,80,'+(0.2+pulse*0.1)+')');
+      coreGlow.addColorStop(1,'rgba(255,160,40,0)');
+      ctx.fillStyle=coreGlow;
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size*0.9,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+      ctx.globalAlpha=alpha;
+    }
+    
     ctx.save();
     ctx.translate(this.x,this.y); ctx.rotate(this.angle);
     const s=this.size;
@@ -1820,7 +1839,7 @@ function aiUpdate(t,game,diff){
 
 // ==================== 游戏主体 ====================
 const Game={
-  state:'menu', // menu, playing, paused, roundEnd, matchEnd, rogueSel
+  state:'menu', // menu, playing, paused, roundEnd, matchEnd, endlessSel
   mode:'ffa', diff:'normal', goal:10, mapMode:'cycle', mapId:1,
   mapIdx:0, lastMapIdx:-1,
   tanks:[], bullets:[], powerups:[], mines:[], crates:[],
@@ -1833,12 +1852,17 @@ const Game={
   poison:null,    // {x,y,radius,damageTick,nextShrink}
   // 3v3 攻防：基地
   bases:[],       // [{x,y,team,hp,maxHp}]
-  // 肉鸽升级选择
+  // 升级选择（无尽升级模式用）
   rogueOpts:null, // 三选一升级
-  roguePendingKill:null, // 待领取升级的击杀坦克
+  roguePendingKill:null, // 待领取升级的玩家
   rogueWave:0,
-  // 无尽模式：玩家等级与升级进度
-  endlessLevel:0, endlessKillsSinceLevelUp:0,
+  endlessRevive:null, // 无尽模式待复活敌人
+  // 无尽升级模式：玩家等级与升级进度
+  endlessLevel:0, endlessKillsSinceLevelUp:0, endlessKills:0, endlessWave:0,
+  // 背景图片
+  bgBattle:null,  // 对战界面背景
+  bgLoaded:false,
+  animTime:0,     // 动画时间（用于10秒循环动态背景）
 
   // 无尽模式升级阈值：从 level 升到 level+1 所需击杀数
   // 参考《吸血鬼幸存者》等爆款：前期快、中期平稳、后期慢但可达
@@ -1856,6 +1880,10 @@ const Game={
   init(){
     this.ctx=document.getElementById('game').getContext('2d');
     this.ctx.imageSmoothingEnabled=false;
+    // 加载对战背景图片（第二张）
+    this.bgBattle=new Image();
+    this.bgBattle.onload=()=>{this.bgLoaded=true;};
+    this.bgBattle.src='背景图片 (1).png';
     Input.init();
     this.bindUI();
     this.applySettings();
@@ -2186,22 +2214,7 @@ const Game={
 
   onKill(victim,killerId){
     const killer=this.tanks.find(t=>t.id===killerId);
-    // 肉鸽模式：玩家击杀后弹出三选一升级
-    if(MODES[this.mode]?.roguelike){
-      if(killer&&killer.isPlayer && this.state!=='rogueSel'){
-        this.rogueWave++;
-        const pool=ROGUE_UPGRADES.slice();
-        const opts=[];
-        for(let k=0;k<3&&pool.length;k++){
-          const idx=Math.floor(Math.random()*pool.length);
-          opts.push(pool.splice(idx,1)[0]);
-        }
-        this.rogueOpts=opts;
-        this.roguePendingKill=killer;
-        this.state='rogueSel';
-      }
-    }
-    // 无尽模式：等级增幅制
+    // 无尽升级模式：等级增幅制
     if(MODES[this.mode]?.endless && victim && !victim.isPlayer){
       this.endlessWave++;
       const isPlayerKill = killer && killer.isPlayer;
@@ -2296,20 +2309,9 @@ const Game={
     this.rogueOpts=null; this.roguePendingKill=null;
     this.state='playing';
   },
-  roguePick(idx){
-    if(!this.rogueOpts||!this.roguePendingKill)return;
-    const up=this.rogueOpts[idx];
-    if(up){
-      up.apply(this.roguePendingKill);
-      spawnFloat(this.roguePendingKill.x,this.roguePendingKill.y-24,up.name,'#b967ff',this);
-      Sfx.play('powerup');
-    }
-    this.rogueOpts=null; this.roguePendingKill=null;
-    this.state='playing';
-  },
 
   checkRoundEnd(){
-    if(this.state!=='playing'&&this.state!=='rogueSel'&&this.state!=='endlessSel')return;
+    if(this.state!=='playing'&&this.state!=='endlessSel')return;
     const alive=this.tanks.filter(t=>t.alive);
     // 无尽模式：玩家死亡即结束
     if(this.mode==='endless'){
@@ -2494,15 +2496,7 @@ const Game={
       }
       return;
     }
-    // 肉鸽升级选择：支持键盘1/2/3
-    if(this.state==='rogueSel'){
-      if(Input.keys['1'])this.roguePick(0);
-      else if(Input.keys['2'])this.roguePick(1);
-      else if(Input.keys['3'])this.roguePick(2);
-      updateParticles(); updateFloats();
-      return;
-    }
-    // 无尽模式增幅选择：支持键盘1/2/3
+    // 无尽升级模式增幅选择：支持键盘1/2/3
     if(this.state==='endlessSel'){
       if(Input.keys['1'])this.endlessPick(0);
       else if(Input.keys['2'])this.endlessPick(1);
@@ -2628,76 +2622,132 @@ const Game={
     ctx.save();
     ctx.translate(sx,sy);
 
-    // 背景（离屏缓存）
-    if(!this.bgCache){
-      const off=document.createElement('canvas');
-      off.width=CFG.W; off.height=CFG.H;
-      const oc=off.getContext('2d');
-      const g=oc.createRadialGradient(CFG.W*0.5,CFG.H*0.5,60,CFG.W*0.5,CFG.H*0.5,CFG.W*0.65);
-      g.addColorStop(0,'#0a1218'); g.addColorStop(0.5,'#070d14'); g.addColorStop(1,'#040608');
-      oc.fillStyle=g; oc.fillRect(0,0,CFG.W,CFG.H);
+    // 背景（图片背景 + 10秒循环流光动态效果）
+    ctx.fillStyle='#020408';
+    ctx.fillRect(0,0,CFG.W,CFG.H);
+    const cx=CFG.W/2, cy=CFG.H/2;
+    if(this.bgLoaded && this.bgBattle){
+      // 绘制背景图片，等比例覆盖
+      const img=this.bgBattle;
+      const scale=Math.max(CFG.W/img.width, CFG.H/img.height);
+      const dw=img.width*scale, dh=img.height*scale;
+      const dx=(CFG.W-dw)/2, dy=(CFG.H-dh)/2;
+      ctx.drawImage(img,dx,dy,dw,dh);
+      // 调暗光效：多层暗色叠加增加层次感
+      ctx.fillStyle='rgba(2,5,10,0.55)';
+      ctx.fillRect(0,0,CFG.W,CFG.H);
+      // 中心稍亮，四周更暗的层次感
+      const midGrad=ctx.createRadialGradient(cx,cy,100,cx,cy,500);
+      midGrad.addColorStop(0,'rgba(0,0,0,0)');
+      midGrad.addColorStop(0.6,'rgba(0,5,15,0.15)');
+      midGrad.addColorStop(1,'rgba(0,0,0,0.4)');
+      ctx.fillStyle=midGrad; ctx.fillRect(0,0,CFG.W,CFG.H);
+    }else{
+      // 备用：程序生成背景
+      const g=ctx.createRadialGradient(CFG.W*0.5,CFG.H*0.5,60,CFG.W*0.5,CFG.H*0.5,CFG.W*0.65);
+      g.addColorStop(0,'#080e16'); g.addColorStop(0.5,'#05080e'); g.addColorStop(1,'#020408');
+      ctx.fillStyle=g; ctx.fillRect(0,0,CFG.W,CFG.H);
       const HS=42; const HW=HS*Math.sqrt(3); const HH=HS*1.5;
-      oc.strokeStyle='rgba(74,163,223,0.07)'; oc.lineWidth=0.8;
+      ctx.strokeStyle='rgba(0,120,180,0.04)'; ctx.lineWidth=0.8;
       for(let row=0,y=-HS;row<CFG.H/HH+2;row++,y=row*HH-HS){
         const offX=(row%2)*HW/2;
         for(let col=0,x=-HW+offX;col<CFG.W/HW+2;col++,x=col*HW+offX-HW){
-          oc.beginPath();
+          ctx.beginPath();
           for(let i=0;i<6;i++){
             const a=Math.PI/3*i+Math.PI/6;
             const px=x+Math.cos(a)*HS, py=y+Math.sin(a)*HS;
-            i===0?oc.moveTo(px,py):oc.lineTo(px,py);
+            i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
           }
-          oc.closePath(); oc.stroke();
+          ctx.closePath(); ctx.stroke();
         }
       }
-      const cx=CFG.W/2, cy=CFG.H/2;
-      const ringG=oc.createRadialGradient(cx,cy,40,cx,cy,180);
-      ringG.addColorStop(0,'rgba(74,163,223,0)');
-      ringG.addColorStop(0.7,'rgba(74,163,223,0.05)');
-      ringG.addColorStop(0.85,'rgba(74,163,223,0.12)');
-      ringG.addColorStop(1,'rgba(74,163,223,0)');
-      oc.fillStyle=ringG; oc.fillRect(cx-200,cy-200,400,400);
-      oc.strokeStyle='rgba(74,163,223,0.15)'; oc.lineWidth=1;
-      for(let r=60;r<=160;r+=35){oc.beginPath();oc.arc(cx,cy,r,0,Math.PI*2);oc.stroke()}
-      oc.strokeStyle='rgba(74,163,223,0.2)'; oc.lineWidth=1;
-      oc.beginPath();oc.moveTo(cx-80,cy);oc.lineTo(cx-30,cy);oc.moveTo(cx+30,cy);oc.lineTo(cx+80,cy);
-      oc.moveTo(cx,cy-80);oc.lineTo(cx,cy-30);oc.moveTo(cx,cy+30);oc.lineTo(cx,cy+80);oc.stroke();
-      const corners=[[0,0,'rgba(74,163,223,0.08)'],[CFG.W,0,'rgba(232,168,74,0.05)'],
-                     [0,CFG.H,'rgba(232,168,74,0.05)'],[CFG.W,CFG.H,'rgba(74,163,223,0.08)']];
-      for(const [px,py,col] of corners){
-        const cg=oc.createRadialGradient(px,py,10,px,py,350);
-        cg.addColorStop(0,col); cg.addColorStop(1,col.replace(/[\d.]+\)$/,'0)'));
-        oc.fillStyle=cg; oc.fillRect(0,0,CFG.W,CFG.H);
-      }
-      for(let i=0;i<3500;i++){
-        const v=Math.random();
-        oc.fillStyle=v>0.5?'rgba(100,140,170,'+(Math.random()*0.05)+')':'rgba(0,0,0,'+(Math.random()*0.12)+')';
-        oc.fillRect(Math.random()*CFG.W,Math.random()*CFG.H,1,1);
-      }
-      for(let i=0;i<20;i++){
-        oc.strokeStyle='rgba(0,0,0,'+(Math.random()*0.12+0.04)+')';
-        oc.lineWidth=Math.random()*0.6+0.3;
-        const x=Math.random()*CFG.W,y=Math.random()*CFG.H;
-        const len=Math.random()*35+15, a=Math.random()*Math.PI*2;
-        oc.beginPath();oc.moveTo(x,y);oc.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len);oc.stroke();
-      }
-      oc.save();
-      oc.translate(CFG.W/2,CFG.H/2);
-      oc.rotate(-0.35);
-      oc.font='bold 52px "Consolas","Microsoft YaHei",sans-serif';
-      oc.textAlign='center'; oc.textBaseline='middle';
-      oc.fillStyle='rgba(120,160,200,0.09)';
-      oc.fillText('浪尖儿大学社区',0,0);
-      oc.strokeStyle='rgba(140,180,220,0.06)';
-      oc.lineWidth=1;
-      oc.strokeText('浪尖儿大学社区',0,0);
-      oc.restore();
-      this.bgCache=off;
     }
-    ctx.drawImage(this.bgCache,0,0);
-    // 暗角
-    const grad=ctx.createRadialGradient(CFG.W/2,CFG.H/2,CFG.H/2.2,CFG.W/2,CFG.H/2,CFG.W/1.25);
-    grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,0.5)');
+    // ===== 10秒循环流光动态效果（更暗、更柔和） =====
+    const t=this.animTime/600; // 0~1循环
+    // 1. 中心光晕呼吸（更暗）
+    const pulse=0.5+Math.sin(t*Math.PI*2)*0.25;
+    const ringG=ctx.createRadialGradient(cx,cy,50,cx,cy,250+pulse*40);
+    ringG.addColorStop(0,'rgba(0,150,220,0)');
+    ringG.addColorStop(0.5,'rgba(0,170,230,'+(0.03+pulse*0.02)+')');
+    ringG.addColorStop(0.75,'rgba(0,190,240,'+(0.06+pulse*0.03)+')');
+    ringG.addColorStop(1,'rgba(0,150,220,0)');
+    ctx.fillStyle=ringG; ctx.fillRect(0,0,CFG.W,CFG.H);
+    // 多层旋转光环（更细更暗）
+    ctx.save();
+    ctx.translate(cx,cy);
+    for(let layer=0;layer<3;layer++){
+      ctx.save();
+      ctx.rotate(t*Math.PI*2*(0.15+layer*0.12)+layer*2);
+      const alpha=0.06+layer*0.03+pulse*0.03;
+      ctx.strokeStyle='rgba(0,180,230,'+alpha+')';
+      ctx.lineWidth=1+layer*0.4;
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,180,230,0.3)';
+      const r=80+layer*50;
+      ctx.beginPath();
+      ctx.arc(0,0,r,t*Math.PI*3+layer,t*Math.PI*3+layer+Math.PI*1.2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+    // 2. 对角线流光扫描（更淡更柔和）
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    for(let i=0;i<2;i++){
+      const scanPos=(t+i/2)%1;
+      const lineX=scanPos*(CFG.W+500)-250;
+      const grad1=ctx.createLinearGradient(lineX-80,0,lineX+80,0);
+      grad1.addColorStop(0,'rgba(0,150,220,0)');
+      grad1.addColorStop(0.5,'rgba(0,200,250,'+(0.04+pulse*0.03)+')');
+      grad1.addColorStop(1,'rgba(0,150,220,0)');
+      ctx.fillStyle=grad1;
+      ctx.save();
+      ctx.translate(CFG.W/2,CFG.H/2);
+      ctx.rotate(-0.35+i*0.25);
+      ctx.fillRect(-CFG.W,-12,CFG.W*2,24);
+      ctx.restore();
+    }
+    ctx.restore();
+    // 3. 角落星光脉动（更暗）
+    const corners=[
+      [0,0,'rgba(50,150,200,'+(0.05+Math.sin(t*Math.PI*2)*0.03)+')'],
+      [CFG.W,0,'rgba(0,130,200,'+(0.04+Math.sin(t*Math.PI*2+1.5)*0.025)+')'],
+      [0,CFG.H,'rgba(0,110,180,'+(0.04+Math.sin(t*Math.PI*2+3)*0.025)+')'],
+      [CFG.W,CFG.H,'rgba(50,160,210,'+(0.05+Math.sin(t*Math.PI*2+4.5)*0.03)+')']
+    ];
+    for(const [px,py,col] of corners){
+      const cg=ctx.createRadialGradient(px,py,20,px,py,280);
+      cg.addColorStop(0,col); cg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=cg; ctx.fillRect(0,0,CFG.W,CFG.H);
+    }
+    // 4. 飘动光粒子（更少更暗）
+    for(let i=0;i<40;i++){
+      const seed=i*137.7;
+      const px=((seed+t*120+Math.sin(t*Math.PI*2+seed*0.1)*40)%CFG.W+CFG.W)%CFG.W;
+      const py=((seed*0.6+t*40+Math.cos(t*Math.PI*2+seed*0.1)*30)%CFG.H+CFG.H)%CFG.H;
+      const alpha=0.06+Math.sin(t*Math.PI*3+seed)*0.04;
+      const size=0.8+Math.sin(t*Math.PI*2+seed)*0.3;
+      ctx.fillStyle='rgba(140,200,230,'+alpha+')';
+      ctx.shadowBlur=4; ctx.shadowColor='rgba(0,150,220,0.4)';
+      ctx.beginPath();ctx.arc(px,py,size,0,Math.PI*2);ctx.fill();
+    }
+    ctx.shadowBlur=0;
+    // 5. 浪尖儿大学社区斜水印
+    ctx.save();
+    ctx.translate(CFG.W/2,CFG.H/2);
+    ctx.rotate(-0.35);
+    ctx.font='bold 52px "Consolas","Microsoft YaHei",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(100,150,190,0.07)';
+    ctx.fillText('浪尖儿大学社区',0,0);
+    ctx.strokeStyle='rgba(120,170,210,0.04)';
+    ctx.lineWidth=1;
+    ctx.strokeText('浪尖儿大学社区',0,0);
+    ctx.restore();
+    // 6. 多层暗角（增加层次感）
+    const grad=ctx.createRadialGradient(CFG.W/2,CFG.H/2,CFG.H/3,CFG.W/2,CFG.H/2,CFG.W/1.1);
+    grad.addColorStop(0,'rgba(0,0,0,0)');
+    grad.addColorStop(0.6,'rgba(0,0,0,0.25)');
+    grad.addColorStop(1,'rgba(0,0,0,0.65)');
     ctx.fillStyle=grad; ctx.fillRect(0,0,CFG.W,CFG.H);
 
     // 毒圈渲染（生存模式）
@@ -2738,26 +2788,31 @@ const Game={
         const path=new Path2D();
         for(const w of this.map.walls) path.rect(w.x,w.y,w.w,w.h);
         oc.save();
-        oc.shadowColor='rgba(0,0,0,0.6)'; oc.shadowBlur=8; oc.shadowOffsetY=4;
-        oc.fillStyle='#1e2a38'; oc.fill(path);
+        oc.shadowColor='rgba(0,0,0,0.75)'; oc.shadowBlur=10; oc.shadowOffsetY=5;
+        oc.fillStyle='#121a24'; oc.fill(path);
         oc.restore();
         const g=oc.createLinearGradient(0,0,0,CFG.H);
-        g.addColorStop(0,'#3a4a5c'); g.addColorStop(0.5,'#2a3a4c'); g.addColorStop(1,'#1e2a38');
+        g.addColorStop(0,'#253242'); g.addColorStop(0.4,'#1a2532'); g.addColorStop(1,'#121a24');
         oc.fillStyle=g; oc.fill(path);
         oc.globalCompositeOperation='source-atop';
         const hg=oc.createLinearGradient(0,0,0,CFG.H);
-        hg.addColorStop(0,'rgba(180,190,202,0.32)'); hg.addColorStop(0.18,'rgba(180,190,202,0)');
+        hg.addColorStop(0,'rgba(140,160,180,0.22)'); hg.addColorStop(0.15,'rgba(140,160,180,0)');
         oc.fillStyle=hg; oc.fillRect(0,0,CFG.W,CFG.H);
-        for(let i=0;i<3500;i++){
+        for(let i=0;i<2500;i++){
           const v=Math.random();
-          oc.fillStyle=v>0.5?'rgba(190,200,212,'+(Math.random()*0.07)+')':'rgba(0,0,0,'+(Math.random()*0.11)+')';
+          oc.fillStyle=v>0.5?'rgba(150,170,190,'+(Math.random()*0.05)+')':'rgba(0,0,0,'+(Math.random()*0.15)+')';
           oc.fillRect(Math.random()*CFG.W,Math.random()*CFG.H,1,1);
         }
-        oc.strokeStyle='rgba(0,0,0,0.28)'; oc.lineWidth=1;
-        for(let x=0;x<CFG.W;x+=28){oc.beginPath();oc.moveTo(x,0);oc.lineTo(x,CFG.H);oc.stroke()}
-        for(let y=0;y<CFG.H;y+=28){oc.beginPath();oc.moveTo(0,y);oc.lineTo(CFG.W,y);oc.stroke()}
-        oc.fillStyle='rgba(150,160,172,0.4)';
-        for(let x=14;x<CFG.W;x+=28)for(let y=14;y<CFG.H;y+=28){oc.beginPath();oc.arc(x,y,1.2,0,Math.PI*2);oc.fill()}
+        oc.strokeStyle='rgba(0,0,0,0.4)'; oc.lineWidth=1;
+        for(let x=0;x<CFG.W;x+=32){oc.beginPath();oc.moveTo(x,0);oc.lineTo(x,CFG.H);oc.stroke()}
+        for(let y=0;y<CFG.H;y+=32){oc.beginPath();oc.moveTo(0,y);oc.lineTo(CFG.W,y);oc.stroke()}
+        oc.fillStyle='rgba(100,120,140,0.35)';
+        for(let x=16;x<CFG.W;x+=32)for(let y=16;y<CFG.H;y+=32){oc.beginPath();oc.arc(x,y,1,0,Math.PI*2);oc.fill()}
+        // 边缘高光
+        oc.strokeStyle='rgba(100,140,180,0.15)'; oc.lineWidth=1;
+        for(const w of this.map.walls){
+          oc.strokeRect(w.x+0.5,w.y+0.5,w.w-1,w.h-1);
+        }
         oc.globalCompositeOperation='source-over';
         this.wallCache=off; this.wallCacheKey=this.map.id;
       }
@@ -2863,81 +2918,16 @@ const Game={
       ctx.fillText(n>0?n:'GO!',CFG.W/2,CFG.H/2);
       ctx.shadowBlur=0;
     }
-    // 肉鸽三选一升级面板（不受震动影响）
-    if(this.state==='rogueSel'&&this.rogueOpts){
+    // 无尽升级模式增幅选择面板（不受震动影响）
+    if(this.state==='endlessSel'&&this.rogueOpts){
+      // 无尽升级模式增幅选择面板
       ctx.fillStyle='rgba(5,8,20,0.82)'; ctx.fillRect(0,0,CFG.W,CFG.H);
       ctx.font='bold 30px Consolas'; ctx.textAlign='center';
-      ctx.shadowBlur=16; ctx.shadowColor='#b967ff'; ctx.fillStyle='#b967ff';
-      ctx.fillText('✦ 能力增强 · 3 选 1 ✦', CFG.W/2, CFG.H/2-120);
+      ctx.shadowBlur=16; ctx.shadowColor='#ffa726'; ctx.fillStyle='#ffa726';
+      ctx.fillText(`✦ 无尽升级 · Lv${this.endlessLevel} ✦`, CFG.W/2, CFG.H/2-120);
       ctx.shadowBlur=0;
       ctx.font='13px Consolas'; ctx.fillStyle='#7a8aa8';
-      ctx.fillText('按数字键 1 / 2 / 3 选择，或点击卡片', CFG.W/2, CFG.H/2-90);
-      const opts=this.rogueOpts;
-      const cardW=200, cardH=180, gap=30;
-      const totalW=cardW*3+gap*2;
-      const startX=CFG.W/2-totalW/2;
-      const cy=CFG.H/2;
-      for(let i=0;i<3;i++){
-        const x=startX+i*(cardW+gap);
-        const y=cy-cardH/2;
-        const col=opts[i]?(['#00f5ff','#b967ff','#ffa726'][i]):'#444';
-        // 卡片
-        ctx.save();
-        ctx.shadowBlur=20; ctx.shadowColor=col;
-        ctx.strokeStyle=col; ctx.lineWidth=2;
-        ctx.fillStyle='rgba(10,16,30,0.95)';
-        this.roundRect(ctx,x,y,cardW,cardH,14,true,true);
-        ctx.shadowBlur=0;
-        // 数字键
-        ctx.fillStyle=col; ctx.font='bold 14px Consolas'; ctx.textAlign='center';
-        ctx.fillText('[ '+ (i+1) +' ]', x+cardW/2, y+26);
-        // 图标圆
-        ctx.beginPath(); ctx.arc(x+cardW/2, y+68, 28, 0, Math.PI*2);
-        ctx.fillStyle=col+'22'; ctx.strokeStyle=col; ctx.lineWidth=2;
-        ctx.fill(); ctx.stroke();
-        ctx.fillStyle=col; ctx.font='bold 24px Consolas'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        const icons=['⚡','🛡','💥','🎯','🚀','❤','🔥','↯','⛏'];
-        // 简单映射
-        const iconMap={fireRate:'⚡',moveSpeed:'🏃',damage:'💥',maxHp:'❤',shield:'🛡',bulletSpd:'🚀',regen:'❤',multi:'🔥',bounce:'↯',pierce:'⛏'};
-        ctx.fillText(iconMap[opts[i]?.id]||'✦', x+cardW/2, y+68);
-        // 名称
-        ctx.textBaseline='alphabetic';
-        ctx.fillStyle='#fff'; ctx.font='bold 17px Consolas';
-        ctx.fillText(opts[i]?.name||'', x+cardW/2, y+122);
-        // 描述
-        ctx.fillStyle='#7a8aa8'; ctx.font='12px Consolas';
-        ctx.fillText(opts[i]?.desc||'', x+cardW/2, y+148);
-        ctx.restore();
-        // 点击绑定（只在首次建立）
-        if(!this._rogueCardsBound){
-          ctx.canvas._cardRects=ctx.canvas._cardRects||[];
-          ctx.canvas._cardRects.push({x,y,w:cardW,h:cardH,idx:i});
-        }
-      }
-      if(!this._rogueCardsBound){
-        this._rogueCardsBound=true;
-        const cvs=ctx.canvas;
-        cvs.onclick=e=>{
-          if(Game.state!=='rogueSel')return;
-          const rect=cvs.getBoundingClientRect();
-          const mx=(e.clientX-rect.left)*(cvs.width/rect.width);
-          const my=(e.clientY-rect.top)*(cvs.height/rect.height);
-          const crs=cvs._cardRects||[];
-          for(const c of crs){
-            if(mx>=c.x&&mx<=c.x+c.w&&my>=c.y&&my<=c.y+c.h){Game.roguePick(c.idx);break}
-          }
-          cvs._cardRects=[];
-        };
-      }
-    }else if(this.state==='endlessSel'&&this.rogueOpts){
-      // 无尽模式增幅选择面板
-      ctx.fillStyle='rgba(5,8,20,0.82)'; ctx.fillRect(0,0,CFG.W,CFG.H);
-      ctx.font='bold 30px Consolas'; ctx.textAlign='center';
-      ctx.shadowBlur=16; ctx.shadowColor='#ff3d5a'; ctx.fillStyle='#ff3d5a';
-      ctx.fillText(`✦ 无尽增幅 · Lv${this.endlessLevel} ✦`, CFG.W/2, CFG.H/2-120);
-      ctx.shadowBlur=0;
-      ctx.font='13px Consolas'; ctx.fillStyle='#7a8aa8';
-      ctx.fillText('按数字键 1 / 2 / 3 选择，或点击卡片', CFG.W/2, CFG.H/2-90);
+      ctx.fillText('击杀敌人升级，获得能力强化 | 按数字键 1 / 2 / 3 选择，或点击卡片', CFG.W/2, CFG.H/2-90);
       const opts=this.rogueOpts;
       const cardW=200, cardH=180, gap=30;
       const totalW=cardW*3+gap*2;
@@ -2988,10 +2978,6 @@ const Game={
         };
       }
     }else{
-      if(this._rogueCardsBound){
-        this._rogueCardsBound=false;
-        if(ctx.canvas._cardRects)ctx.canvas._cardRects=[];
-      }
       if(this._endlessCardsBound){
         this._endlessCardsBound=false;
         if(ctx.canvas._endlessCardRects)ctx.canvas._endlessCardRects=[];
@@ -3011,6 +2997,7 @@ const Game={
   },
 
   loop(){
+    this.animTime=(this.animTime+1)%600; // 10秒循环（60fps×600帧=10秒）
     this.update();
     this.render();
     requestAnimationFrame(()=>this.loop());

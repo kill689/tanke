@@ -2695,26 +2695,26 @@ const Game={
         }
       }
     }
-    // ===== 10秒循环流光动态效果（更暗、更柔和） =====
+    // ===== 10秒循环流光动态效果 =====
     const t=this.animTime/600; // 0~1循环
-    // 1. 中心光晕呼吸（更暗）
+    // 1. 中心光晕呼吸
     const pulse=0.5+Math.sin(t*Math.PI*2)*0.25;
     const ringG=ctx.createRadialGradient(cx,cy,50,cx,cy,250+pulse*40);
     ringG.addColorStop(0,'rgba(0,150,220,0)');
-    ringG.addColorStop(0.5,'rgba(0,170,230,'+(0.03+pulse*0.02)+')');
-    ringG.addColorStop(0.75,'rgba(0,190,240,'+(0.06+pulse*0.03)+')');
+    ringG.addColorStop(0.5,'rgba(0,180,240,'+(0.06+pulse*0.04)+')');
+    ringG.addColorStop(0.75,'rgba(0,200,255,'+(0.1+pulse*0.05)+')');
     ringG.addColorStop(1,'rgba(0,150,220,0)');
     ctx.fillStyle=ringG; ctx.fillRect(0,0,CFG.W,CFG.H);
-    // 多层旋转光环（更细更暗）
+    // 多层旋转光环
     ctx.save();
     ctx.translate(cx,cy);
     for(let layer=0;layer<3;layer++){
       ctx.save();
       ctx.rotate(t*Math.PI*2*(0.15+layer*0.12)+layer*2);
-      const alpha=0.06+layer*0.03+pulse*0.03;
-      ctx.strokeStyle='rgba(0,180,230,'+alpha+')';
-      ctx.lineWidth=1+layer*0.4;
-      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,180,230,0.3)';
+      const alpha=0.1+layer*0.05+pulse*0.05;
+      ctx.strokeStyle='rgba(0,190,240,'+alpha+')';
+      ctx.lineWidth=1.2+layer*0.5;
+      ctx.shadowBlur=12; ctx.shadowColor='rgba(0,190,240,0.4)';
       const r=80+layer*50;
       ctx.beginPath();
       ctx.arc(0,0,r,t*Math.PI*3+layer,t*Math.PI*3+layer+Math.PI*1.2);
@@ -2722,7 +2722,7 @@ const Game={
       ctx.restore();
     }
     ctx.restore();
-    // 2. 对角线流光扫描（更淡更柔和）
+    // 2. 对角线流光扫描
     ctx.save();
     ctx.globalCompositeOperation='screen';
     for(let i=0;i<2;i++){
@@ -2730,7 +2730,7 @@ const Game={
       const lineX=scanPos*(CFG.W+500)-250;
       const grad1=ctx.createLinearGradient(lineX-80,0,lineX+80,0);
       grad1.addColorStop(0,'rgba(0,150,220,0)');
-      grad1.addColorStop(0.5,'rgba(0,200,250,'+(0.04+pulse*0.03)+')');
+      grad1.addColorStop(0.5,'rgba(0,210,255,'+(0.08+pulse*0.05)+')');
       grad1.addColorStop(1,'rgba(0,150,220,0)');
       ctx.fillStyle=grad1;
       ctx.save();
@@ -2740,27 +2740,27 @@ const Game={
       ctx.restore();
     }
     ctx.restore();
-    // 3. 角落星光脉动（更暗）
+    // 3. 角落星光脉动
     const corners=[
-      [0,0,'rgba(50,150,200,'+(0.05+Math.sin(t*Math.PI*2)*0.03)+')'],
-      [CFG.W,0,'rgba(0,130,200,'+(0.04+Math.sin(t*Math.PI*2+1.5)*0.025)+')'],
-      [0,CFG.H,'rgba(0,110,180,'+(0.04+Math.sin(t*Math.PI*2+3)*0.025)+')'],
-      [CFG.W,CFG.H,'rgba(50,160,210,'+(0.05+Math.sin(t*Math.PI*2+4.5)*0.03)+')']
+      [0,0,'rgba(80,170,220,'+(0.08+Math.sin(t*Math.PI*2)*0.05)+')'],
+      [CFG.W,0,'rgba(30,150,220,'+(0.07+Math.sin(t*Math.PI*2+1.5)*0.04)+')'],
+      [0,CFG.H,'rgba(30,130,200,'+(0.07+Math.sin(t*Math.PI*2+3)*0.04)+')'],
+      [CFG.W,CFG.H,'rgba(80,180,230,'+(0.08+Math.sin(t*Math.PI*2+4.5)*0.05)+')']
     ];
     for(const [px,py,col] of corners){
       const cg=ctx.createRadialGradient(px,py,20,px,py,280);
       cg.addColorStop(0,col); cg.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=cg; ctx.fillRect(0,0,CFG.W,CFG.H);
     }
-    // 4. 飘动光粒子（更少更暗）
-    for(let i=0;i<40;i++){
+    // 4. 飘动光粒子
+    for(let i=0;i<60;i++){
       const seed=i*137.7;
       const px=((seed+t*120+Math.sin(t*Math.PI*2+seed*0.1)*40)%CFG.W+CFG.W)%CFG.W;
       const py=((seed*0.6+t*40+Math.cos(t*Math.PI*2+seed*0.1)*30)%CFG.H+CFG.H)%CFG.H;
-      const alpha=0.06+Math.sin(t*Math.PI*3+seed)*0.04;
-      const size=0.8+Math.sin(t*Math.PI*2+seed)*0.3;
-      ctx.fillStyle='rgba(140,200,230,'+alpha+')';
-      ctx.shadowBlur=4; ctx.shadowColor='rgba(0,150,220,0.4)';
+      const alpha=0.12+Math.sin(t*Math.PI*3+seed)*0.08;
+      const size=1+Math.sin(t*Math.PI*2+seed)*0.4;
+      ctx.fillStyle='rgba(160,220,250,'+alpha+')';
+      ctx.shadowBlur=6; ctx.shadowColor='rgba(0,180,230,0.5)';
       ctx.beginPath();ctx.arc(px,py,size,0,Math.PI*2);ctx.fill();
     }
     ctx.shadowBlur=0;

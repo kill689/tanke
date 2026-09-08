@@ -2764,18 +2764,6 @@ const Game={
       ctx.beginPath();ctx.arc(px,py,size,0,Math.PI*2);ctx.fill();
     }
     ctx.shadowBlur=0;
-    // 5. 浪尖儿大学社区斜水印
-    ctx.save();
-    ctx.translate(CFG.W/2,CFG.H/2);
-    ctx.rotate(-0.35);
-    ctx.font='bold 52px "Consolas","Microsoft YaHei",sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(100,150,190,0.07)';
-    ctx.fillText('浪尖儿大学社区',0,0);
-    ctx.strokeStyle='rgba(120,170,210,0.04)';
-    ctx.lineWidth=1;
-    ctx.strokeText('浪尖儿大学社区',0,0);
-    ctx.restore();
     // 6. 多层暗角（增加层次感）
     const grad=ctx.createRadialGradient(CFG.W/2,CFG.H/2,CFG.H/3,CFG.W/2,CFG.H/2,CFG.W/1.1);
     grad.addColorStop(0,'rgba(0,0,0,0)');

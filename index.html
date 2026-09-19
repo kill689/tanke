@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05080f">
+<!-- 菜单背景预加载：让首屏背景尽早开始下载 -->
+<link rel="preload" as="image" href="bg-menu.webp" fetchpriority="high">
 <title>钢铁洪流 · 坦克对战</title>
 <style>
   :root{
@@ -33,7 +36,7 @@
   /* ===== 覆盖层 UI（相对于 stage 定位） ===== */
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
     background-color:rgba(5,10,25,0.65);
-    background-image:url('背景图片.png');
+    background-image:url('bg-menu.webp');
     background-size:cover;
     background-position:center;
     z-index:10;
@@ -1899,10 +1902,14 @@ const Game={
   init(){
     this.ctx=document.getElementById('game').getContext('2d');
     this.ctx.imageSmoothingEnabled=false;
-    // 加载对战背景图片（第二张）
+    // 对战背景图：延后到首屏渲染完成后再加载，避免与菜单背景抢带宽（移动端提速）
     this.bgBattle=new Image();
+    this.bgBattle.decoding='async';
     this.bgBattle.onload=()=>{this.bgLoaded=true;};
-    this.bgBattle.src='背景图片 (1).png';
+    let bgRequested=false;
+    const loadBattleBg=()=>{ if(bgRequested) return; bgRequested=true; this.bgBattle.src='bg-battle.webp'; };
+    if(window.requestIdleCallback) requestIdleCallback(loadBattleBg,{timeout:2000});
+    else setTimeout(loadBattleBg,800);
     Input.init();
     this.bindUI();
     this.applySettings();
